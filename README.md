@@ -119,10 +119,10 @@ app.get("/students/credits", (req, res) => {
 
 ## Documentación postman
 
-[link]('https://documenter.getpostman.com/view/20932670/UyxhonQX')
+Documentación de los endpoints con ejemplos
 
+[Postman Documentation Link](https://documenter.getpostman.com/view/20932670/UyxhonQX)
 <br>
-
 ## Dependencias usadas
 
 * Jest
