@@ -1,27 +1,120 @@
-# 5 Code Challenge
+# Code Challenge - Microsoft
 
-Visual Partner-Ship te ha asignado el siguiente proyecto:
+## Requerimientos 
 
-# Cursos de Visual Thinking API
+* Habilitar un endpoint para consultar todos los estudiantes con todos sus campos.
+* Habilitar un endpoint para consultar los emails de todos los estudiantes que tengan certificación haveCertification.
+* Habilitar un endpoint para consultar todos los estudiantes que tengan credits mayor a 500.
 
-Aquí encuentras la db en formato JSON de los estudiantes de Visual Partner-Ship: https://gist.github.com/carlogilmar/1f5164637fb77aecef3b9e6b9e2a9b63
+## Diseño de componentes
 
-Requerimientos:
-1. Habilitar un endpoint para consultar todos los estudiantes con todos sus campos.
-2. Habilitar un endpoint para consultar los emails de todos los estudiantes que tengan certificación `haveCertification`.
-3. Habilitar un endpoint para consultar todos los estudiantes que tengan `credits` mayor a 500.
+<br>
 
-Entrega:
-- Crea un repositorio en GitHub para guardar este nuevo proyecto.
-- Agrega pruebas automatizadas con GitHub Actions.
-- Sé consistente en tu control de versiones, que tus commits expliquen tu forma de construir el proyecto.
-- Agrega un readme.md con las siguientes secciones:   
-  - Detalla qué dependencias estás usando y para qué.
-  - Explica el diseño de tus componentes.
-  - Explica tu API: cómo consultarla, qué formato va a responder, incluye ejemplos etc.
+```mermaid
+graph TD
+    A[Reader] & B[StudentServices]
+    A --> C[StudentController]
+    B --> C[StudentController]
+    C --> D[Server]
+```
+### Reader
 
-Tú decides qué hacer, cómo hacerlo, cómo diseñarlo. TODO.
+Se encarga de leer el archivo 'visualpartners.json' para convertirlo en datos modificables.
 
-Importante: Toma nota de cuanto tiempo te lleva resolver esto.
+```js
+const fs = require("fs");
 
-![image](https://user-images.githubusercontent.com/17634377/165870375-fe5a730a-eada-4abe-ac9c-42334e003b18.png)
+class Reader {
+    static readJsonFile(path) {
+        const rawdata = fs.readFileSync(path);
+        return JSON.parse(rawdata);
+    }
+}
+
+module.exports = Reader;
+```
+
+### StudentServices
+
+Tiene los metodos para analizar los estudiantes y regresarlos.
+
+```js
+class studentServices {
+    static studentFullFields(students) {
+        return students;
+    }
+
+    static studentCertificationField(students) {
+        return students
+            .filter((student) => {
+                return student.haveCertification === true;
+            })
+            .map((student) => {
+                return student.email;
+            });
+    }
+
+    static studentCredits(students) {
+        return students.filter((student) => {
+            return student.credits > 500;
+        });
+    }
+}
+
+module.exports = studentServices;
+```
+
+### StudentsController
+
+Se encarga de juntar services y reader, conectando con el server.
+
+```js
+const Reader = require("./../utils/Reader");
+const StudentServices = require("./../services/StudentServices");
+
+class StudentController {
+    static studentFullFields() {
+        const data = Reader.readJsonFile("data/visualpartners.json");
+        return StudentServices.studentFullFields(data);
+    }
+
+    static studentCertificationField() {
+        const data = Reader.readJsonFile("data/visualpartners.json");
+        return StudentServices.studentCertificationField(data);
+    }
+
+    static studentCredits() {
+        const data = Reader.readJsonFile("data/visualpartners.json");
+        return StudentServices.studentCredits(data);
+    }
+}
+
+module.exports = StudentController;
+```
+
+### Node Server Endpoints
+
+Inicializa el servidor y escucha peticiones.
+
+``` js
+app.get("/", (req, res) => {
+    res.status(200).send("Welcome");
+});
+
+app.get("/v1/students", (req, res) => {
+    res.status(200).send(StudentController.studentFullFields());
+});
+
+app.get("/students/emails", (req, res) => {
+    res.status(200).send(StudentController.studentCertificationField());
+});
+
+app.get("/students/credits", (req, res) => {
+    res.status(200).send(StudentController.studentCredits());
+});
+
+});
+```
+<br>
+
+## Documentación postman
