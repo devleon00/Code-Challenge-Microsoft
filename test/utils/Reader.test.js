@@ -19,3 +19,5 @@ describe("Test de clase 'Reader'", () => {
         expect(expectClass[0]).toEqual(expected);
     });
 });
+
+// Probando
