@@ -118,3 +118,13 @@ app.get("/students/credits", (req, res) => {
 <br>
 
 ## Documentación postman
+
+[link]('https://documenter.getpostman.com/view/20932670/UyxhonQX')
+
+<br>
+
+## Dependencias usadas
+
+* Jest
+* Express
+* Linter
